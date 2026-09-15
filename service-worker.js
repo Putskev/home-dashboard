@@ -1,4 +1,4 @@
-const CACHE_NAME = "home-dashboard-v1";
+const CACHE_NAME = "home-dashboard-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -30,19 +30,19 @@ self.addEventListener("fetch", (event) => {
 
   // Never cache the live weather/geocoding API calls.
   if (url.hostname.endsWith("open-meteo.com")) return;
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
 
+  // Network-first for the app shell: always get the latest version when
+  // online, only fall back to the cached copy when offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request)
-        .then((res) => {
-          if (event.request.method === "GET" && res.ok && url.origin === self.location.origin) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return res;
-        })
-        .catch(() => cached);
-    })
+    fetch(event.request)
+      .then((res) => {
+        if (res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
