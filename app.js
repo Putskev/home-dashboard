@@ -144,24 +144,36 @@ const listsGrid = document.getElementById("listsGrid");
 const listCardTemplate = document.getElementById("listCardTemplate");
 const listItemTemplate = document.getElementById("listItemTemplate");
 
+const LIST_COLORS = ["#a78bfa", "#60a5fa", "#fb923c", "#34d399", "#f472b6", "#fbbf24", "#2dd4bf"];
+
 function renderLists() {
   listsGrid.innerHTML = "";
-  for (const list of state.lists) {
-    listsGrid.appendChild(buildListCard(list));
-  }
+  state.lists.forEach((list, index) => {
+    listsGrid.appendChild(buildListCard(list, index));
+  });
 }
 
-function buildListCard(list) {
+function buildListCard(list, index) {
   const node = listCardTemplate.content.firstElementChild.cloneNode(true);
   const nameInput = node.querySelector(".list-name-input");
   const deleteBtn = node.querySelector(".delete-list-btn");
   const itemList = node.querySelector(".item-list");
   const addForm = node.querySelector(".add-item-form");
   const addInput = node.querySelector(".add-item-input");
+  const icon = node.querySelector(".list-icon");
+  const count = node.querySelector(".list-count");
+
+  const accent = LIST_COLORS[index % LIST_COLORS.length];
+  node.style.setProperty("--list-accent", accent);
+  icon.textContent = (list.name.trim()[0] || "?").toUpperCase();
+
+  const openCount = list.items.filter((i) => !i.done).length;
+  count.textContent = list.items.length ? `${openCount}/${list.items.length}` : "";
 
   nameInput.value = list.name;
   nameInput.addEventListener("change", () => {
     list.name = nameInput.value.trim() || list.name;
+    icon.textContent = (list.name.trim()[0] || "?").toUpperCase();
     saveState();
   });
 
@@ -213,6 +225,11 @@ function buildListItem(list, item) {
     item.lastDone = item.done ? todayStr() : item.lastDone;
     node.classList.toggle("done", item.done);
     saveState();
+    const countEl = node.closest(".list-card")?.querySelector(".list-count");
+    if (countEl) {
+      const openCount = list.items.filter((i) => !i.done).length;
+      countEl.textContent = list.items.length ? `${openCount}/${list.items.length}` : "";
+    }
   });
 
   recurringBtn.addEventListener("click", () => {

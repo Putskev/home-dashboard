@@ -1,15 +1,20 @@
 :root {
-  --bg: #0f1420;
-  --bg-elev: #161d2e;
-  --bg-elev-2: #1e2740;
-  --border: #2a3450;
-  --text: #eef1f8;
-  --text-dim: #9aa4bd;
-  --accent: #6ea8fe;
-  --accent-2: #7c5cff;
-  --danger: #ff6b6b;
-  --done: #4b5573;
-  --radius: 18px;
+  --bg: #0a0d18;
+  --bg-soft: #0d1122;
+  --text: #f4f6fc;
+  --text-dim: #99a2c3;
+  --text-dimmer: #6b7395;
+  --accent: #7c9eff;
+  --accent-2: #b18cff;
+  --danger: #ff6b81;
+  --done: #545e7d;
+  --radius: 22px;
+  --radius-sm: 14px;
+
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-bg-strong: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --shadow: 0 12px 32px rgba(3, 5, 12, 0.45);
 }
 
 * { box-sizing: border-box; }
@@ -17,10 +22,10 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
@@ -29,25 +34,95 @@ button, input {
   font-family: inherit;
 }
 
+/* ---------- Decorative background ---------- */
+
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.28;
+}
+
+.blob-a {
+  width: 480px;
+  height: 480px;
+  top: -160px;
+  left: -120px;
+  background: radial-gradient(circle, #7c9eff, transparent 70%);
+}
+
+.blob-b {
+  width: 520px;
+  height: 520px;
+  top: 20%;
+  right: -180px;
+  background: radial-gradient(circle, #b18cff, transparent 70%);
+}
+
+.blob-c {
+  width: 420px;
+  height: 420px;
+  bottom: -180px;
+  left: 30%;
+  background: radial-gradient(circle, #34d399, transparent 70%);
+  opacity: 0.16;
+}
+
+header, main, dialog {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Glass card base ---------- */
+
+.weather-card,
+.list-card,
+.app-dialog,
+.detail-stat,
+.hourly-item,
+.daily-item {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Header ---------- */
+
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 28px 8px;
+  padding: 28px 28px 10px;
 }
 
 .topbar-left h1 {
   margin: 0;
   font-size: 3rem;
-  font-weight: 300;
-  letter-spacing: 1px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #ffffff, #aab4d8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .topbar-left p {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   color: var(--text-dim);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   text-transform: capitalize;
+  font-weight: 500;
 }
 
 main {
@@ -59,12 +134,12 @@ main {
 /* ---------- Weather ---------- */
 
 .weather-section {
-  margin-bottom: 28px;
+  margin-bottom: 30px;
 }
 
 .weather-row {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
   padding: 4px 2px 10px;
   scroll-snap-type: x proximity;
@@ -73,26 +148,27 @@ main {
 .weather-card {
   position: relative;
   flex: 0 0 auto;
-  min-width: 160px;
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 18px;
+  min-width: 172px;
+  background: linear-gradient(155deg, rgba(124, 158, 255, 0.16), rgba(177, 140, 255, 0.08) 60%, var(--glass-bg));
+  padding: 18px 20px;
   scroll-snap-align: start;
   text-align: left;
   cursor: pointer;
   font: inherit;
   color: inherit;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .weather-card:hover, .weather-card:focus-visible {
-  border-color: var(--accent);
+  border-color: rgba(124, 158, 255, 0.5);
   outline: none;
+  transform: translateY(-2px);
 }
 
 .weather-loc-name {
-  margin: 0 22px 8px 0;
-  font-size: 1rem;
+  margin: 0 22px 10px 0;
+  font-size: 0.98rem;
+  font-weight: 600;
   color: var(--text-dim);
   white-space: nowrap;
   overflow: hidden;
@@ -103,46 +179,57 @@ main {
 .weather-main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .weather-icon {
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(124, 158, 255, 0.35));
 }
 
 .weather-temp {
-  font-size: 2rem;
-  font-weight: 500;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .weather-desc {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--text-dim);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .weather-minmax {
   margin: 4px 0 0;
   font-size: 0.85rem;
-  color: var(--text-dim);
+  color: var(--text-dimmer);
+  font-weight: 600;
 }
 
 .remove-location-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .add-location-btn {
   background: none;
-  border: 1px dashed var(--border);
+  border: 1.5px dashed var(--glass-border);
   color: var(--text-dim);
-  border-radius: 12px;
-  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  padding: 11px 20px;
   font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.add-location-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 /* ---------- Lists ---------- */
@@ -155,10 +242,7 @@ main {
 }
 
 .list-card {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 16px 12px;
+  padding: 18px 18px 14px;
   display: flex;
   flex-direction: column;
   min-height: 180px;
@@ -167,24 +251,51 @@ main {
 .list-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.list-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #0b0e18;
+  background: var(--list-accent, var(--accent));
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--list-accent, var(--accent)) 55%, transparent);
 }
 
 .list-name-input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   color: var(--text);
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   padding: 4px 2px;
   border-radius: 8px;
 }
 
 .list-name-input:focus {
   outline: none;
-  background: var(--bg-elev-2);
+  background: var(--glass-bg-strong);
+}
+
+.list-count {
+  flex: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 3px 9px;
 }
 
 .item-list {
@@ -198,9 +309,9 @@ main {
 .list-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 2px;
-  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .list-item:last-child {
@@ -210,21 +321,49 @@ main {
 .item-check-label {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
   cursor: pointer;
 }
 
 .item-checkbox {
-  width: 22px;
-  height: 22px;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
   flex: none;
-  accent-color: var(--accent);
+  border-radius: 8px;
+  border: 2px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.item-checkbox::after {
+  content: "";
+  width: 6px;
+  height: 11px;
+  border-right: 2.5px solid #0b0e18;
+  border-bottom: 2.5px solid #0b0e18;
+  transform: rotate(45deg) translate(-1px, -1px) scale(0);
+  transition: transform 0.12s ease;
+}
+
+.item-checkbox:checked {
+  background: var(--list-accent, var(--accent));
+  border-color: var(--list-accent, var(--accent));
+}
+
+.item-checkbox:checked::after {
+  transform: rotate(45deg) translate(-1px, -1px) scale(1);
 }
 
 .item-text {
-  font-size: 1.05rem;
+  font-size: 1.03rem;
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
 
@@ -242,7 +381,7 @@ main {
 
 .list-item.recurring .recurring-toggle {
   opacity: 1;
-  color: var(--accent);
+  color: var(--list-accent, var(--accent));
 }
 
 .delete-item-btn {
@@ -264,32 +403,50 @@ main {
 .add-item-form {
   display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .add-item-input {
   flex: 1;
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
   color: var(--text);
-  padding: 10px 12px;
+  padding: 11px 14px;
   font-size: 1rem;
+  font-weight: 500;
 }
 
 .add-item-input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--list-accent, var(--accent));
+}
+
+.add-item-btn {
+  background: var(--list-accent, var(--accent));
+  color: #0b0e18;
+}
+
+.add-item-btn:hover {
+  background: var(--list-accent, var(--accent));
+  filter: brightness(1.1);
 }
 
 .add-list-btn {
   background: none;
-  border: 1px dashed var(--border);
+  border: 1.5px dashed var(--glass-border);
   color: var(--text-dim);
-  border-radius: 12px;
-  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  padding: 13px 22px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.add-list-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 /* ---------- Buttons ---------- */
@@ -306,29 +463,35 @@ main {
 }
 
 .icon-btn:hover, .icon-btn:active {
-  background: var(--bg-elev-2);
+  background: var(--glass-bg-strong);
   color: var(--text);
 }
 
 .ghost-btn {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   color: var(--text);
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 11px 18px;
+  border-radius: 999px;
   font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.ghost-btn:hover {
+  border-color: var(--accent);
 }
 
 .primary-btn {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   border: none;
   color: #0b0e18;
-  font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 12px;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 999px;
   font-size: 0.95rem;
   cursor: pointer;
+  box-shadow: 0 8px 20px rgba(124, 158, 255, 0.35);
 }
 
 /* Edit mode: only then can list names / delete buttons be used */
@@ -342,39 +505,44 @@ body:not(.edit-mode) .list-name-input {
   pointer-events: none;
 }
 
+#editModeBtn {
+  border-radius: 999px;
+}
+
 #editModeBtn.active {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #0b0e18;
   border-color: transparent;
+  box-shadow: 0 8px 20px rgba(124, 158, 255, 0.35);
 }
 
 /* ---------- Dialogs ---------- */
 
 .app-dialog {
-  background: var(--bg-elev);
+  background: linear-gradient(165deg, #131829 0%, #0e1224 100%);
   color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 22px;
+  padding: 24px;
   width: min(420px, 92vw);
 }
 
 .app-dialog::backdrop {
-  background: rgba(5, 8, 15, 0.65);
+  background: rgba(4, 6, 12, 0.7);
+  backdrop-filter: blur(4px);
 }
 
 .dialog-form h2 {
   margin: 0 0 14px;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  font-weight: 800;
 }
 
 .dialog-form input[type="text"] {
   width: 100%;
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
   color: var(--text);
-  padding: 12px 14px;
+  padding: 13px 15px;
   font-size: 1rem;
 }
 
@@ -398,18 +566,20 @@ body:not(.edit-mode) .list-name-input {
 
 .location-result {
   padding: 12px 10px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .location-result:hover {
-  background: var(--bg-elev-2);
+  background: var(--glass-bg-strong);
 }
 
 .location-result-sub {
   color: var(--text-dim);
   font-size: 0.8rem;
+  font-weight: 400;
 }
 
 .empty-hint {
@@ -435,70 +605,76 @@ body:not(.edit-mode) .list-name-input {
 
 .detail-header h2 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
 .detail-updated {
   margin: 4px 0 0;
   color: var(--text-dim);
   font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .detail-current {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin: 20px 0 16px;
+  gap: 18px;
+  margin: 22px 0 18px;
 }
 
 .detail-icon {
-  font-size: 3.4rem;
+  font-size: 3.6rem;
   line-height: 1;
+  filter: drop-shadow(0 6px 14px rgba(124, 158, 255, 0.35));
 }
 
 .detail-temp {
-  font-size: 2.6rem;
-  font-weight: 500;
+  font-size: 2.8rem;
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: -1px;
 }
 
 .detail-desc {
   color: var(--text-dim);
-  margin-top: 4px;
+  margin-top: 6px;
+  font-weight: 500;
 }
 
 .detail-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .detail-stat {
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
+  background: var(--glass-bg-strong);
+  padding: 11px 13px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
 }
 
 .detail-stat-label {
   color: var(--text-dim);
   font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .detail-stat-value {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.08rem;
+  font-weight: 700;
 }
 
 .detail-subheading {
   margin: 4px 0 10px;
   font-size: 1rem;
   color: var(--text-dim);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .hourly-row {
@@ -506,17 +682,17 @@ body:not(.edit-mode) .list-name-input {
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .hourly-item {
   flex: 0 0 auto;
   min-width: 64px;
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 8px;
+  background: var(--glass-bg-strong);
+  padding: 11px 8px;
   text-align: center;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
 }
 
 .hourly-item p {
@@ -526,6 +702,7 @@ body:not(.edit-mode) .list-name-input {
 .hourly-time {
   font-size: 0.78rem;
   color: var(--text-dim);
+  font-weight: 600;
   margin-bottom: 4px !important;
 }
 
@@ -537,19 +714,20 @@ body:not(.edit-mode) .list-name-input {
 
 .hourly-temp {
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .hourly-precip {
   font-size: 0.72rem;
   color: var(--accent);
+  font-weight: 600;
   min-height: 1em;
 }
 
 .daily-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .daily-item {
@@ -557,10 +735,10 @@ body:not(.edit-mode) .list-name-input {
   grid-template-columns: 44px 32px 1fr auto auto;
   align-items: center;
   gap: 10px;
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 12px;
+  background: var(--glass-bg-strong);
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
 }
 
 .daily-item p {
@@ -568,7 +746,7 @@ body:not(.edit-mode) .list-name-input {
 }
 
 .daily-day {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
 }
 
@@ -580,18 +758,20 @@ body:not(.edit-mode) .list-name-input {
 .daily-desc {
   color: var(--text-dim);
   font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .daily-precip {
   font-size: 0.8rem;
   color: var(--accent);
+  font-weight: 700;
   min-width: 44px;
   text-align: right;
 }
 
 .daily-minmax {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   min-width: 80px;
   text-align: right;
 }

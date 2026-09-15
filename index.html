@@ -4,16 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Home Dashboard</title>
-<meta name="theme-color" content="#0f1420">
+<meta name="theme-color" content="#0a0d18">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon.svg">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div class="bg-decor" aria-hidden="true">
+  <span class="blob blob-a"></span>
+  <span class="blob blob-b"></span>
+  <span class="blob blob-c"></span>
+</div>
 
 <header class="topbar">
   <div class="topbar-left">
@@ -93,7 +102,9 @@
 <template id="listCardTemplate">
   <div class="list-card">
     <div class="list-card-header">
+      <span class="list-icon"></span>
       <input class="list-name-input" type="text" />
+      <span class="list-count"></span>
       <button class="icon-btn delete-list-btn" title="Liste löschen">✕</button>
     </div>
     <ul class="item-list"></ul>
