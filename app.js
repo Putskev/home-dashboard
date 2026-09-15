@@ -122,6 +122,20 @@ function clockTick() {
     lastDay = nowDay;
     if (applyDailyReset()) renderLists();
   }
+  maybeAutoReload();
+}
+
+// If this tab has been open continuously since a previous calendar day and
+// it's now past the quiet hour, reload once so a long-running dashboard tab
+// (never manually closed) still picks up app updates. A fresh page load is
+// already current, so this only fires for sessions that span midnight.
+const AUTO_RELOAD_HOUR = 4;
+const appLoadDate = todayStr();
+function maybeAutoReload() {
+  const now = new Date();
+  if (todayStr() === appLoadDate) return;
+  if (now.getHours() < AUTO_RELOAD_HOUR) return;
+  location.reload();
 }
 
 // ---------- Lists rendering ----------
@@ -520,6 +534,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     if (applyDailyReset()) renderLists();
     for (const loc of state.weatherLocations) fetchWeather(loc);
+    maybeAutoReload();
   }
 });
 
