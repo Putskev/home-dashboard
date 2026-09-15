@@ -272,11 +272,20 @@ function buildWeatherCard(loc) {
   node.querySelector(".weather-temp").textContent = "";
   node.querySelector(".weather-desc").textContent = "Lädt…";
 
-  node.querySelector(".remove-location-btn").addEventListener("click", () => {
+  node.querySelector(".remove-location-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
     state.weatherLocations = state.weatherLocations.filter((l) => l.id !== loc.id);
     delete weatherCache[loc.id];
     saveState();
     renderWeather();
+  });
+
+  node.addEventListener("click", () => openWeatherDetail(loc));
+  node.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openWeatherDetail(loc);
+    }
   });
 
   return node;
@@ -290,8 +299,10 @@ async function fetchWeather(loc) {
   }
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
-      `&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min` +
-      `&timezone=auto`;
+      `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation` +
+      `&hourly=temperature_2m,weather_code,precipitation_probability` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max` +
+      `&timezone=auto&forecast_days=7`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Wetter-Abfrage fehlgeschlagen");
     const data = await res.json();
@@ -317,6 +328,118 @@ function paintWeatherCard(loc, data) {
   const min = data.daily?.temperature_2m_min?.[0];
   if (max !== undefined && min !== undefined) {
     card.querySelector(".weather-minmax").textContent = `${Math.round(min)}° / ${Math.round(max)}°`;
+  }
+}
+
+// ---------- Weather detail dialog ----------
+
+const weatherDetailDialog = document.getElementById("weatherDetailDialog");
+const hourlyItemTemplate = document.getElementById("hourlyItemTemplate");
+const dailyItemTemplate = document.getElementById("dailyItemTemplate");
+
+document.getElementById("closeWeatherDetail").addEventListener("click", () => weatherDetailDialog.close());
+
+const weekdayShort = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+
+function hhmm(isoLike) {
+  // e.g. "2026-09-15T14:00" -> "14:00"
+  const t = isoLike?.split("T")[1];
+  return t ? t.slice(0, 5) : "–";
+}
+
+function uvLabel(uv) {
+  if (uv === undefined || uv === null) return "";
+  if (uv < 3) return "niedrig";
+  if (uv < 6) return "mittel";
+  if (uv < 8) return "hoch";
+  if (uv < 11) return "sehr hoch";
+  return "extrem";
+}
+
+async function openWeatherDetail(loc) {
+  document.getElementById("detailLocName").textContent = loc.name;
+  document.getElementById("detailUpdated").textContent = "Lädt…";
+  document.getElementById("detailStats").innerHTML = "";
+  document.getElementById("hourlyRow").innerHTML = "";
+  document.getElementById("dailyList").innerHTML = "";
+  weatherDetailDialog.showModal();
+
+  let cached = weatherCache[loc.id];
+  if (!cached) {
+    await fetchWeather(loc);
+    cached = weatherCache[loc.id];
+  }
+  if (!cached) {
+    document.getElementById("detailUpdated").textContent = "Daten nicht verfügbar";
+    return;
+  }
+  renderWeatherDetail(loc, cached.data);
+  document.getElementById("detailUpdated").textContent =
+    "Aktualisiert um " + new Date(cached.fetchedAt).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+}
+
+function renderWeatherDetail(loc, data) {
+  const cur = data.current || {};
+  const [icon, desc] = wmoInfo(cur.weather_code);
+  document.getElementById("detailIcon").textContent = icon;
+  document.getElementById("detailTemp").textContent =
+    cur.temperature_2m !== undefined ? `${Math.round(cur.temperature_2m)}°` : "–";
+  document.getElementById("detailDesc").textContent = desc;
+
+  const stats = document.getElementById("detailStats");
+  stats.innerHTML = "";
+  const statEntries = [
+    ["Gefühlt wie", cur.apparent_temperature !== undefined ? `${Math.round(cur.apparent_temperature)}°` : "–"],
+    ["Luftfeuchtigkeit", cur.relative_humidity_2m !== undefined ? `${Math.round(cur.relative_humidity_2m)}%` : "–"],
+    ["Wind", cur.wind_speed_10m !== undefined ? `${Math.round(cur.wind_speed_10m)} km/h` : "–"],
+    ["Niederschlag", cur.precipitation !== undefined ? `${cur.precipitation} mm` : "–"],
+  ];
+  if (data.daily?.uv_index_max?.[0] !== undefined) {
+    statEntries.push(["UV-Index", `${Math.round(data.daily.uv_index_max[0])} (${uvLabel(data.daily.uv_index_max[0])})`]);
+  }
+  if (data.daily?.sunrise?.[0]) statEntries.push(["Sonnenaufgang", hhmm(data.daily.sunrise[0])]);
+  if (data.daily?.sunset?.[0]) statEntries.push(["Sonnenuntergang", hhmm(data.daily.sunset[0])]);
+  for (const [label, value] of statEntries) {
+    const el = document.createElement("div");
+    el.className = "detail-stat";
+    el.innerHTML = `<span class="detail-stat-label">${label}</span><span class="detail-stat-value">${value}</span>`;
+    stats.appendChild(el);
+  }
+
+  // Hourly: next 24h starting from the current hour
+  const hourlyRow = document.getElementById("hourlyRow");
+  hourlyRow.innerHTML = "";
+  const times = data.hourly?.time || [];
+  const now = new Date();
+  let startIdx = times.findIndex((t) => new Date(t) >= now);
+  if (startIdx === -1) startIdx = 0;
+  for (let i = startIdx; i < Math.min(startIdx + 24, times.length); i++) {
+    const node = hourlyItemTemplate.content.firstElementChild.cloneNode(true);
+    node.querySelector(".hourly-time").textContent = i === startIdx ? "Jetzt" : hhmm(times[i]);
+    const [hIcon] = wmoInfo(data.hourly.weather_code[i]);
+    node.querySelector(".hourly-icon").textContent = hIcon;
+    node.querySelector(".hourly-temp").textContent = `${Math.round(data.hourly.temperature_2m[i])}°`;
+    const precip = data.hourly.precipitation_probability?.[i];
+    node.querySelector(".hourly-precip").textContent = precip !== undefined ? `${precip}%` : "";
+    hourlyRow.appendChild(node);
+  }
+
+  // Daily: next 7 days
+  const dailyList = document.getElementById("dailyList");
+  dailyList.innerHTML = "";
+  const days = data.daily?.time || [];
+  for (let i = 0; i < days.length; i++) {
+    const node = dailyItemTemplate.content.firstElementChild.cloneNode(true);
+    const d = new Date(days[i]);
+    node.querySelector(".daily-day").textContent = i === 0 ? "Heute" : weekdayShort[d.getDay()];
+    const [dIcon, dDesc] = wmoInfo(data.daily.weather_code[i]);
+    node.querySelector(".daily-icon").textContent = dIcon;
+    node.querySelector(".daily-desc").textContent = dDesc;
+    const precip = data.daily.precipitation_probability_max?.[i];
+    node.querySelector(".daily-precip").textContent = precip !== undefined ? `☔ ${precip}%` : "";
+    node.querySelector(".daily-minmax").textContent =
+      `${Math.round(data.daily.temperature_2m_min[i])}° / ${Math.round(data.daily.temperature_2m_max[i])}°`;
+    dailyList.appendChild(node);
   }
 }
 

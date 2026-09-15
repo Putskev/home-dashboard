@@ -61,6 +61,35 @@
   </form>
 </dialog>
 
+<!-- Dialog: Wetter-Detail -->
+<dialog id="weatherDetailDialog" class="app-dialog weather-detail-dialog">
+  <div class="dialog-form">
+    <div class="detail-header">
+      <div>
+        <h2 id="detailLocName">Ort</h2>
+        <p id="detailUpdated" class="detail-updated"></p>
+      </div>
+      <button type="button" id="closeWeatherDetail" class="ghost-btn">Schließen</button>
+    </div>
+
+    <div class="detail-current">
+      <span id="detailIcon" class="detail-icon"></span>
+      <div>
+        <div id="detailTemp" class="detail-temp"></div>
+        <div id="detailDesc" class="detail-desc"></div>
+      </div>
+    </div>
+
+    <div class="detail-stats" id="detailStats"></div>
+
+    <h3 class="detail-subheading">Stündlich</h3>
+    <div id="hourlyRow" class="hourly-row"></div>
+
+    <h3 class="detail-subheading">Nächste Tage</h3>
+    <div id="dailyList" class="daily-list"></div>
+  </div>
+</dialog>
+
 <template id="listCardTemplate">
   <div class="list-card">
     <div class="list-card-header">
@@ -87,7 +116,7 @@
 </template>
 
 <template id="weatherCardTemplate">
-  <div class="weather-card">
+  <div class="weather-card" role="button" tabindex="0" title="Für Details antippen">
     <button class="icon-btn remove-location-btn" title="Ort entfernen">✕</button>
     <p class="weather-loc-name"></p>
     <div class="weather-main">
@@ -96,6 +125,25 @@
     </div>
     <p class="weather-desc"></p>
     <p class="weather-minmax"></p>
+  </div>
+</template>
+
+<template id="hourlyItemTemplate">
+  <div class="hourly-item">
+    <p class="hourly-time"></p>
+    <span class="hourly-icon"></span>
+    <p class="hourly-temp"></p>
+    <p class="hourly-precip"></p>
+  </div>
+</template>
+
+<template id="dailyItemTemplate">
+  <div class="daily-item">
+    <p class="daily-day"></p>
+    <span class="daily-icon"></span>
+    <p class="daily-desc"></p>
+    <p class="daily-precip"></p>
+    <p class="daily-minmax"></p>
   </div>
 </template>
 

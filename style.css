@@ -79,6 +79,15 @@ main {
   border-radius: var(--radius);
   padding: 16px 18px;
   scroll-snap-align: start;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.weather-card:hover, .weather-card:focus-visible {
+  border-color: var(--accent);
+  outline: none;
 }
 
 .weather-loc-name {
@@ -407,6 +416,184 @@ body:not(.edit-mode) .list-name-input {
   color: var(--text-dim);
   font-size: 0.9rem;
   padding: 10px 4px;
+}
+
+/* ---------- Weather detail dialog ---------- */
+
+.weather-detail-dialog {
+  width: min(640px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.detail-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.detail-updated {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.detail-current {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0 16px;
+}
+
+.detail-icon {
+  font-size: 3.4rem;
+  line-height: 1;
+}
+
+.detail-temp {
+  font-size: 2.6rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.detail-desc {
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.detail-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.detail-stat {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-stat-label {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+}
+
+.detail-stat-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.detail-subheading {
+  margin: 4px 0 10px;
+  font-size: 1rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.hourly-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 22px;
+}
+
+.hourly-item {
+  flex: 0 0 auto;
+  min-width: 64px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.hourly-item p {
+  margin: 0;
+}
+
+.hourly-time {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-bottom: 4px !important;
+}
+
+.hourly-icon {
+  font-size: 1.4rem;
+  display: block;
+  margin: 2px 0;
+}
+
+.hourly-temp {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.hourly-precip {
+  font-size: 0.72rem;
+  color: var(--accent);
+  min-height: 1em;
+}
+
+.daily-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.daily-item {
+  display: grid;
+  grid-template-columns: 44px 32px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.daily-item p {
+  margin: 0;
+}
+
+.daily-day {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.daily-icon {
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.daily-desc {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.daily-precip {
+  font-size: 0.8rem;
+  color: var(--accent);
+  min-width: 44px;
+  text-align: right;
+}
+
+.daily-minmax {
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
 }
 
 /* Tablet landscape tuning */
