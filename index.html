@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home Dashboard</title>
+<meta name="theme-color" content="#0f1420">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <h1 id="clock">--:--</h1>
+    <p id="dateline">&nbsp;</p>
+  </div>
+  <div class="topbar-right">
+    <button id="editModeBtn" class="ghost-btn" title="Bearbeiten">✏️ Bearbeiten</button>
+  </div>
+</header>
+
+<main>
+  <section class="weather-section" aria-label="Wetter">
+    <div id="weatherRow" class="weather-row"></div>
+    <button id="addLocationBtn" class="add-location-btn">+ Ort hinzufügen</button>
+  </section>
+
+  <section class="lists-section" aria-label="Listen">
+    <div id="listsGrid" class="lists-grid"></div>
+    <button id="addListBtn" class="add-list-btn">+ Neue Liste</button>
+  </section>
+</main>
+
+<!-- Dialog: Ort hinzufügen -->
+<dialog id="locationDialog" class="app-dialog">
+  <form method="dialog" class="dialog-form">
+    <h2>Ort hinzufügen</h2>
+    <input id="locationSearchInput" type="text" placeholder="Stadt suchen, z.B. Berlin" autocomplete="off">
+    <div id="locationResults" class="location-results"></div>
+    <div class="dialog-actions">
+      <button type="button" id="closeLocationDialog" class="ghost-btn">Schließen</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Dialog: Neue Liste -->
+<dialog id="listDialog" class="app-dialog">
+  <form method="dialog" class="dialog-form" id="newListForm">
+    <h2>Neue Liste</h2>
+    <input id="newListName" type="text" placeholder="Name der Liste, z.B. Einkaufsliste" autocomplete="off" required>
+    <div class="dialog-actions">
+      <button type="button" id="cancelNewList" class="ghost-btn">Abbrechen</button>
+      <button type="submit" class="primary-btn">Erstellen</button>
+    </div>
+  </form>
+</dialog>
+
+<template id="listCardTemplate">
+  <div class="list-card">
+    <div class="list-card-header">
+      <input class="list-name-input" type="text" />
+      <button class="icon-btn delete-list-btn" title="Liste löschen">✕</button>
+    </div>
+    <ul class="item-list"></ul>
+    <form class="add-item-form">
+      <input class="add-item-input" type="text" placeholder="Eintrag hinzufügen…" autocomplete="off" />
+      <button type="submit" class="icon-btn add-item-btn" title="Hinzufügen">➕</button>
+    </form>
+  </div>
+</template>
+
+<template id="listItemTemplate">
+  <li class="list-item">
+    <label class="item-check-label">
+      <input type="checkbox" class="item-checkbox" />
+      <span class="item-text"></span>
+    </label>
+    <button class="icon-btn recurring-toggle" title="Tägliche Aufgabe (setzt sich täglich zurück)">↻</button>
+    <button class="icon-btn delete-item-btn" title="Eintrag löschen">✕</button>
+  </li>
+</template>
+
+<template id="weatherCardTemplate">
+  <div class="weather-card">
+    <button class="icon-btn remove-location-btn" title="Ort entfernen">✕</button>
+    <p class="weather-loc-name"></p>
+    <div class="weather-main">
+      <span class="weather-icon"></span>
+      <span class="weather-temp"></span>
+    </div>
+    <p class="weather-desc"></p>
+    <p class="weather-minmax"></p>
+  </div>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
