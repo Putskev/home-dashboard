@@ -170,6 +170,8 @@ body.edit-mode .edit-hint {
 
 .grid-stack-item-content {
   overflow: visible;
+  container-type: size;
+  container-name: widget-card;
 }
 
 .drag-handle {
@@ -215,6 +217,7 @@ body.edit-mode .grid-stack-item > .grid-stack-item-content > .list-card {
   transition: border-color 0.15s ease;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   overflow: hidden;
 }
 
@@ -231,30 +234,30 @@ body.edit-mode .weather-card {
 .weather-loc-name {
   flex: none;
   margin: 0 22px 10px 0;
-  font-size: 0.98rem;
+  font-size: clamp(0.85rem, 6.5cqmin, 2.3rem);
   font-weight: 600;
   color: var(--text-dim);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 160px;
+  max-width: 100%;
 }
 
 .weather-main {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: clamp(6px, 3cqmin, 24px);
 }
 
 .weather-icon {
-  font-size: 2.3rem;
+  font-size: clamp(1.6rem, 15cqmin, 7rem);
   line-height: 1;
   filter: drop-shadow(0 4px 10px rgba(124, 158, 255, 0.35));
 }
 
 .weather-temp {
-  font-size: 2.1rem;
+  font-size: clamp(1.5rem, 14cqmin, 6.5rem);
   font-weight: 800;
   letter-spacing: -0.5px;
 }
@@ -263,14 +266,14 @@ body.edit-mode .weather-card {
   flex: none;
   margin: 8px 0 0;
   color: var(--text-dim);
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 5cqmin, 2rem);
   font-weight: 500;
 }
 
 .weather-minmax {
   flex: none;
   margin: 4px 0 0;
-  font-size: 0.85rem;
+  font-size: clamp(0.7rem, 4.5cqmin, 1.9rem);
   color: var(--text-dimmer);
   font-weight: 600;
 }
@@ -320,14 +323,14 @@ body.edit-mode .weather-card {
 
 .list-icon {
   flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
+  width: clamp(28px, 8cqw, 52px);
+  height: clamp(28px, 8cqw, 52px);
+  border-radius: 30%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: clamp(0.8rem, 3.2cqw, 1.5rem);
   color: #0b0e18;
   background: var(--list-accent, var(--accent));
   box-shadow: 0 6px 16px color-mix(in srgb, var(--list-accent, var(--accent)) 55%, transparent);
@@ -339,7 +342,7 @@ body.edit-mode .weather-card {
   background: transparent;
   border: none;
   color: var(--text);
-  font-size: 1.2rem;
+  font-size: clamp(0.95rem, 4.5cqw, 2rem);
   font-weight: 700;
   padding: 4px 2px;
   border-radius: 8px;
@@ -352,7 +355,7 @@ body.edit-mode .weather-card {
 
 .list-count {
   flex: none;
-  font-size: 0.78rem;
+  font-size: clamp(0.65rem, 2.2cqw, 1rem);
   font-weight: 700;
   color: var(--text-dim);
   background: var(--glass-bg-strong);
@@ -394,8 +397,8 @@ body.edit-mode .weather-card {
 .item-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
+  width: clamp(20px, 6cqw, 34px);
+  height: clamp(20px, 6cqw, 34px);
   flex: none;
   border-radius: 8px;
   border: 2px solid var(--glass-border);
@@ -426,7 +429,7 @@ body.edit-mode .weather-card {
 }
 
 .item-text {
-  font-size: 1.03rem;
+  font-size: clamp(0.9rem, 3.6cqw, 1.7rem);
   font-weight: 500;
   overflow-wrap: anywhere;
 }
@@ -439,7 +442,7 @@ body.edit-mode .weather-card {
 .recurring-toggle {
   opacity: 0.35;
   flex: none;
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 4cqw, 1.9rem);
   font-weight: 700;
 }
 
