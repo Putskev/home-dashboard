@@ -100,17 +100,28 @@ header, main, dialog {
 /* ---------- Header ---------- */
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: flex-start;
   padding: 28px 28px 10px;
 }
 
+.topbar-left {
+  grid-column: 2;
+  text-align: center;
+}
+
+.topbar-right {
+  grid-column: 3;
+  justify-self: end;
+}
+
 .topbar-left h1 {
   margin: 0;
-  font-size: 3rem;
+  font-size: 5.5rem;
   font-weight: 800;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
+  line-height: 1;
   background: linear-gradient(135deg, #ffffff, #aab4d8);
   -webkit-background-clip: text;
   background-clip: text;
@@ -118,11 +129,12 @@ header, main, dialog {
 }
 
 .topbar-left p {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   color: var(--text-dim);
-  font-size: 1.05rem;
+  font-size: 1.2rem;
   text-transform: capitalize;
   font-weight: 500;
+  text-align: center;
 }
 
 main {
@@ -831,5 +843,5 @@ body:not(.edit-mode) .list-name-input {
 
 /* Tablet landscape tuning */
 @media (min-width: 900px) {
-  .topbar-left h1 { font-size: 3.6rem; }
+  .topbar-left h1 { font-size: 6rem; }
 }
