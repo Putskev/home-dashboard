@@ -145,6 +145,36 @@ const listItemTemplate = document.getElementById("listItemTemplate");
 
 const LIST_COLORS = ["#a78bfa", "#60a5fa", "#fb923c", "#34d399", "#f472b6", "#fbbf24", "#2dd4bf"];
 
+const FONT_SCALE_MIN = 0.6;
+const FONT_SCALE_MAX = 2;
+
+function wireFontScaleControls(node, obj) {
+  const smallerBtn = node.querySelector(".font-smaller-btn");
+  const largerBtn = node.querySelector(".font-larger-btn");
+  const label = node.querySelector(".font-scale-label");
+  if (!smallerBtn || !largerBtn || !label) return;
+
+  const apply = () => {
+    const scale = obj.fontScale || 1;
+    node.style.setProperty("--font-scale", scale);
+    label.textContent = Math.round(scale * 100) + "%";
+  };
+  apply();
+
+  smallerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    obj.fontScale = Math.max(FONT_SCALE_MIN, Math.round(((obj.fontScale || 1) - 0.1) * 10) / 10);
+    apply();
+    saveState();
+  });
+  largerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    obj.fontScale = Math.min(FONT_SCALE_MAX, Math.round(((obj.fontScale || 1) + 0.1) * 10) / 10);
+    apply();
+    saveState();
+  });
+}
+
 function buildListCard(list, index) {
   const node = listCardTemplate.content.firstElementChild.cloneNode(true);
   const nameInput = node.querySelector(".list-name-input");
@@ -158,6 +188,7 @@ function buildListCard(list, index) {
   const accent = LIST_COLORS[index % LIST_COLORS.length];
   node.style.setProperty("--list-accent", accent);
   icon.textContent = (list.name.trim()[0] || "?").toUpperCase();
+  wireFontScaleControls(node, list);
 
   const openCount = list.items.filter((i) => !i.done).length;
   count.textContent = list.items.length ? `${openCount}/${list.items.length}` : "";
@@ -279,13 +310,29 @@ editModeBtn.addEventListener("click", () => {
 const weatherCardTemplate = document.getElementById("weatherCardTemplate");
 const weatherCache = {}; // locationId -> { data, fetchedAt }
 
+const WEATHER_CARD_STYLES = ["standard", "minimal", "compact"];
+const WEATHER_CARD_STYLE_LABELS = { standard: "Standard", minimal: "Minimal", compact: "Kompakt" };
+
 function buildWeatherCard(loc) {
   const node = weatherCardTemplate.content.firstElementChild.cloneNode(true);
   node.dataset.locId = loc.id;
+  node.dataset.style = loc.cardStyle || "standard";
   node.querySelector(".weather-loc-name").textContent = loc.name;
   node.querySelector(".weather-icon").textContent = "…";
   node.querySelector(".weather-temp").textContent = "";
   node.querySelector(".weather-desc").textContent = "Lädt…";
+  wireFontScaleControls(node, loc);
+
+  const styleBtn = node.querySelector(".card-style-btn");
+  styleBtn.textContent = WEATHER_CARD_STYLE_LABELS[loc.cardStyle || "standard"];
+  styleBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const idx = WEATHER_CARD_STYLES.indexOf(loc.cardStyle || "standard");
+    loc.cardStyle = WEATHER_CARD_STYLES[(idx + 1) % WEATHER_CARD_STYLES.length];
+    node.dataset.style = loc.cardStyle;
+    styleBtn.textContent = WEATHER_CARD_STYLE_LABELS[loc.cardStyle];
+    saveState();
+  });
 
   node.querySelector(".remove-location-btn").addEventListener("click", (e) => {
     e.stopPropagation();
