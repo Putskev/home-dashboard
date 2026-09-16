@@ -560,3 +560,14 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js").catch((e) => console.warn("SW nicht registriert", e));
   });
 }
+
+// Some browsers only honor the manifest's fullscreen display mode once a
+// user has interacted with the page. Request it on the first tap so the
+// Android status/navigation bars stay hidden while the app runs.
+function requestFullscreenOnce() {
+  document.removeEventListener("pointerdown", requestFullscreenOnce);
+  if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+document.addEventListener("pointerdown", requestFullscreenOnce);
