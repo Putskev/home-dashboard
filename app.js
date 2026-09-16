@@ -120,7 +120,7 @@ function clockTick() {
   const nowDay = new Date().getDate();
   if (nowDay !== lastDay) {
     lastDay = nowDay;
-    if (applyDailyReset()) renderLists();
+    if (applyDailyReset()) renderDashboard();
   }
   maybeAutoReload();
 }
@@ -140,18 +140,10 @@ function maybeAutoReload() {
 
 // ---------- Lists rendering ----------
 
-const listsGrid = document.getElementById("listsGrid");
 const listCardTemplate = document.getElementById("listCardTemplate");
 const listItemTemplate = document.getElementById("listItemTemplate");
 
 const LIST_COLORS = ["#a78bfa", "#60a5fa", "#fb923c", "#34d399", "#f472b6", "#fbbf24", "#2dd4bf"];
-
-function renderLists() {
-  listsGrid.innerHTML = "";
-  state.lists.forEach((list, index) => {
-    listsGrid.appendChild(buildListCard(list, index));
-  });
-}
 
 function buildListCard(list, index) {
   const node = listCardTemplate.content.firstElementChild.cloneNode(true);
@@ -181,7 +173,7 @@ function buildListCard(list, index) {
     if (confirm(`Liste "${list.name}" wirklich löschen?`)) {
       state.lists = state.lists.filter((l) => l.id !== list.id);
       saveState();
-      renderLists();
+      renderDashboard();
     }
   });
 
@@ -202,7 +194,7 @@ function buildListCard(list, index) {
     list.items.push({ id: uid(), text, done: false, recurring: false, lastDone: null });
     addInput.value = "";
     saveState();
-    renderLists();
+    renderDashboard();
   });
 
   return node;
@@ -241,7 +233,7 @@ function buildListItem(list, item) {
   deleteBtn.addEventListener("click", () => {
     list.items = list.items.filter((i) => i.id !== item.id);
     saveState();
-    renderLists();
+    renderDashboard();
   });
 
   return node;
@@ -269,7 +261,7 @@ newListForm.addEventListener("submit", (e) => {
   if (!name) return;
   state.lists.push({ id: uid(), name, items: [] });
   saveState();
-  renderLists();
+  renderDashboard();
   listDialog.close();
 });
 
@@ -277,23 +269,15 @@ newListForm.addEventListener("submit", (e) => {
 
 const editModeBtn = document.getElementById("editModeBtn");
 editModeBtn.addEventListener("click", () => {
-  document.body.classList.toggle("edit-mode");
-  editModeBtn.classList.toggle("active");
+  const isEditMode = document.body.classList.toggle("edit-mode");
+  editModeBtn.classList.toggle("active", isEditMode);
+  grid.setStatic(!isEditMode);
 });
 
 // ---------- Weather ----------
 
-const weatherRow = document.getElementById("weatherRow");
 const weatherCardTemplate = document.getElementById("weatherCardTemplate");
 const weatherCache = {}; // locationId -> { data, fetchedAt }
-
-function renderWeather() {
-  weatherRow.innerHTML = "";
-  for (const loc of state.weatherLocations) {
-    weatherRow.appendChild(buildWeatherCard(loc));
-    fetchWeather(loc);
-  }
-}
 
 function buildWeatherCard(loc) {
   const node = weatherCardTemplate.content.firstElementChild.cloneNode(true);
@@ -308,16 +292,22 @@ function buildWeatherCard(loc) {
     state.weatherLocations = state.weatherLocations.filter((l) => l.id !== loc.id);
     delete weatherCache[loc.id];
     saveState();
-    renderWeather();
+    renderDashboard();
   });
 
-  node.addEventListener("click", () => openWeatherDetail(loc));
+  node.addEventListener("click", () => {
+    if (document.body.classList.contains("edit-mode")) return;
+    openWeatherDetail(loc);
+  });
   node.addEventListener("keydown", (e) => {
+    if (document.body.classList.contains("edit-mode")) return;
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       openWeatherDetail(loc);
     }
   });
+
+  fetchWeather(loc);
 
   return node;
 }
@@ -341,13 +331,13 @@ async function fetchWeather(loc) {
     paintWeatherCard(loc, data);
   } catch (err) {
     console.warn("Wetterfehler für", loc.name, err);
-    const card = weatherRow.querySelector(`[data-loc-id="${loc.id}"]`);
+    const card = document.querySelector(`[data-loc-id="${loc.id}"]`);
     if (card) card.querySelector(".weather-desc").textContent = "Nicht verfügbar";
   }
 }
 
 function paintWeatherCard(loc, data) {
-  const card = weatherRow.querySelector(`[data-loc-id="${loc.id}"]`);
+  const card = document.querySelector(`[data-loc-id="${loc.id}"]`);
   if (!card) return;
   const code = data.current?.weather_code;
   const [icon, desc] = wmoInfo(code);
@@ -526,7 +516,7 @@ async function searchLocation(query) {
           lon: r.longitude,
         });
         saveState();
-        renderWeather();
+        renderDashboard();
         locationDialog.close();
       });
       locationResults.appendChild(div);
@@ -536,11 +526,76 @@ async function searchLocation(query) {
   }
 }
 
+// ---------- Dashboard grid (drag to move, corner to resize) ----------
+
+const dashboardGridEl = document.getElementById("dashboardGrid");
+
+const grid = GridStack.init(
+  {
+    column: 12,
+    cellHeight: 80,
+    margin: 10,
+    float: true,
+    animate: true,
+    handle: ".drag-handle",
+    staticGrid: true,
+  },
+  dashboardGridEl
+);
+
+function findWidgetTarget(gsId) {
+  const sep = gsId.indexOf("-");
+  const type = gsId.slice(0, sep);
+  const id = gsId.slice(sep + 1);
+  if (type === "weather") return state.weatherLocations.find((l) => l.id === id);
+  if (type === "list") return state.lists.find((l) => l.id === id);
+  return null;
+}
+
+grid.on("change", (event, items) => {
+  let changed = false;
+  for (const it of items) {
+    const target = findWidgetTarget(String(it.id));
+    if (!target) continue;
+    target.gx = it.x;
+    target.gy = it.y;
+    target.gw = it.w;
+    target.gh = it.h;
+    changed = true;
+  }
+  if (changed) saveState();
+});
+
+function addGridWidget(gsId, innerNode, defaultW, defaultH, obj) {
+  const itemEl = document.createElement("div");
+  itemEl.className = "grid-stack-item";
+  itemEl.setAttribute("gs-id", gsId);
+  itemEl.setAttribute("gs-w", String(obj.gw || defaultW));
+  itemEl.setAttribute("gs-h", String(obj.gh || defaultH));
+  if (obj.gx !== undefined) itemEl.setAttribute("gs-x", String(obj.gx));
+  if (obj.gy !== undefined) itemEl.setAttribute("gs-y", String(obj.gy));
+  const contentEl = document.createElement("div");
+  contentEl.className = "grid-stack-item-content";
+  contentEl.appendChild(innerNode);
+  itemEl.appendChild(contentEl);
+  dashboardGridEl.appendChild(itemEl);
+  grid.makeWidget(itemEl);
+}
+
+function renderDashboard() {
+  grid.removeAll();
+  for (const loc of state.weatherLocations) {
+    addGridWidget(`weather-${loc.id}`, buildWeatherCard(loc), 3, 3, loc);
+  }
+  state.lists.forEach((list, index) => {
+    addGridWidget(`list-${list.id}`, buildListCard(list, index), 4, 4, list);
+  });
+}
+
 // ---------- Init ----------
 
 applyDailyReset();
-renderLists();
-renderWeather();
+renderDashboard();
 updateClock();
 setInterval(clockTick, 1000 * 15);
 setInterval(() => {
@@ -549,7 +604,7 @@ setInterval(() => {
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
-    if (applyDailyReset()) renderLists();
+    if (applyDailyReset()) renderDashboard();
     for (const loc of state.weatherLocations) fetchWeather(loc);
     maybeAutoReload();
   }

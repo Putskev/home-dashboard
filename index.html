@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@13.3.0/dist/gridstack.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -35,15 +36,13 @@
 </header>
 
 <main>
-  <section class="weather-section" aria-label="Wetter">
-    <div id="weatherRow" class="weather-row"></div>
+  <div class="toolbar">
     <button id="addLocationBtn" class="add-location-btn">+ Ort hinzufügen</button>
-  </section>
-
-  <section class="lists-section" aria-label="Listen">
-    <div id="listsGrid" class="lists-grid"></div>
     <button id="addListBtn" class="add-list-btn">+ Neue Liste</button>
-  </section>
+    <span class="edit-hint">Im Bearbeiten-Modus: am Griff ⠿ ziehen zum Verschieben, an der Ecke ziehen zum Skalieren</span>
+  </div>
+
+  <div id="dashboardGrid" class="grid-stack"></div>
 </main>
 
 <!-- Dialog: Ort hinzufügen -->
@@ -102,6 +101,7 @@
 <template id="listCardTemplate">
   <div class="list-card">
     <div class="list-card-header">
+      <span class="drag-handle icon-btn" title="Verschieben">⠿</span>
       <span class="list-icon"></span>
       <input class="list-name-input" type="text" />
       <span class="list-count"></span>
@@ -128,6 +128,7 @@
 
 <template id="weatherCardTemplate">
   <div class="weather-card" role="button" tabindex="0" title="Für Details antippen">
+    <span class="drag-handle icon-btn" title="Verschieben">⠿</span>
     <button class="icon-btn remove-location-btn" title="Ort entfernen">✕</button>
     <p class="weather-loc-name"></p>
     <div class="weather-main">
@@ -158,6 +159,7 @@
   </div>
 </template>
 
+<script src="https://cdn.jsdelivr.net/npm/gridstack@13.3.0/dist/gridstack-all.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
