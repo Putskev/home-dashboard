@@ -352,6 +352,138 @@ body.edit-mode .weather-card {
   flex-basis: 100%;
 }
 
+/* "detailed": location + current line, big hero temp, 5-day range bars */
+.wd-header,
+.wd-hero,
+.wd-forecast-list {
+  display: none;
+}
+
+.weather-card[data-style="detailed"] {
+  justify-content: flex-start;
+}
+
+.weather-card[data-style="detailed"] .weather-loc-name,
+.weather-card[data-style="detailed"] .weather-main,
+.weather-card[data-style="detailed"] .weather-desc,
+.weather-card[data-style="detailed"] .weather-minmax {
+  display: none;
+}
+
+.weather-card[data-style="detailed"] .wd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: none;
+  gap: 10px;
+}
+
+.weather-card[data-style="detailed"] .wd-hero {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 3cqmin, 18px);
+  flex: none;
+  margin: clamp(6px, 3cqmin, 16px) 0 clamp(10px, 4cqmin, 20px);
+}
+
+.weather-card[data-style="detailed"] .wd-forecast-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, 1.5cqmin, 10px);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.wd-location {
+  font-weight: 700;
+  font-size: calc(clamp(0.95rem, 5.5cqmin, 1.8rem) * var(--font-scale, 1));
+}
+
+.wd-current-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+  margin-right: 22px;
+}
+
+.wd-current-line, .wd-humidity-line {
+  font-size: calc(clamp(0.62rem, 2.6cqmin, 1rem) * var(--font-scale, 1));
+  color: var(--text-dim);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wd-hero-icon {
+  font-size: calc(clamp(1.7rem, 11cqmin, 3.8rem) * var(--font-scale, 1));
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(124, 158, 255, 0.35));
+}
+
+.wd-hero-temp {
+  font-size: calc(clamp(1.8rem, 13cqmin, 4.4rem) * var(--font-scale, 1));
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.wd-day-row {
+  display: grid;
+  grid-template-columns: 2.4em 1.6em 2.4em 1fr 2.4em;
+  align-items: center;
+  gap: clamp(4px, 1.8cqmin, 10px);
+  font-size: calc(clamp(0.62rem, 2.3cqmin, 1rem) * var(--font-scale, 1));
+  flex: none;
+}
+
+.wd-day-name {
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.wd-day-icon {
+  text-align: center;
+  font-size: 1.15em;
+}
+
+.wd-day-min {
+  text-align: right;
+  color: var(--text-dim);
+}
+
+.wd-day-max {
+  text-align: left;
+  font-weight: 700;
+}
+
+.wd-range-track {
+  position: relative;
+  height: 0.4em;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.wd-range-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8, #34d399, #fbbf24, #fb7c3c);
+}
+
+.wd-range-dot {
+  position: absolute;
+  top: 50%;
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
 /* ---------- Lists ---------- */
 
 .list-card {
@@ -522,7 +654,7 @@ body.edit-mode .weather-card {
   flex: none;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin: 10px 0;
   padding-top: 10px;
   border-top: 1px solid var(--glass-border);
@@ -542,10 +674,12 @@ body.edit-mode .widget-edit-bar {
 .font-smaller-btn, .font-larger-btn {
   background: var(--glass-bg-strong);
   border: 1px solid var(--glass-border);
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   font-weight: 700;
+  font-size: 1.2rem;
+  touch-action: manipulation;
 }
 
 .font-scale-label {
@@ -561,10 +695,12 @@ body.edit-mode .widget-edit-bar {
   background: var(--glass-bg-strong);
   border: 1px solid var(--glass-border);
   border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.78rem;
+  padding: 9px 16px;
+  font-size: 0.85rem;
   font-weight: 600;
   width: auto;
+  min-height: 40px;
+  touch-action: manipulation;
 }
 
 .add-item-form {

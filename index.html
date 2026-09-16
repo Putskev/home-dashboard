@@ -143,12 +143,39 @@
     </div>
     <p class="weather-desc"></p>
     <p class="weather-minmax"></p>
+
+    <div class="wd-header">
+      <span class="wd-location"></span>
+      <div class="wd-current-info">
+        <span class="wd-current-line"></span>
+        <span class="wd-humidity-line"></span>
+      </div>
+    </div>
+    <div class="wd-hero">
+      <span class="wd-hero-icon"></span>
+      <span class="wd-hero-temp"></span>
+    </div>
+    <div class="wd-forecast-list"></div>
+
     <div class="widget-edit-bar">
       <button class="icon-btn font-smaller-btn" title="Schrift kleiner">–</button>
       <span class="font-scale-label">100%</span>
       <button class="icon-btn font-larger-btn" title="Schrift größer">+</button>
       <button class="icon-btn card-style-btn" title="Anderes Design">Design</button>
     </div>
+  </div>
+</template>
+
+<template id="wdDayRowTemplate">
+  <div class="wd-day-row">
+    <span class="wd-day-name"></span>
+    <span class="wd-day-icon"></span>
+    <span class="wd-day-min"></span>
+    <div class="wd-range-track">
+      <div class="wd-range-fill"></div>
+      <div class="wd-range-dot"></div>
+    </div>
+    <span class="wd-day-max"></span>
   </div>
 </template>
 

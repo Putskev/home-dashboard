@@ -310,8 +310,9 @@ editModeBtn.addEventListener("click", () => {
 const weatherCardTemplate = document.getElementById("weatherCardTemplate");
 const weatherCache = {}; // locationId -> { data, fetchedAt }
 
-const WEATHER_CARD_STYLES = ["standard", "minimal", "compact"];
-const WEATHER_CARD_STYLE_LABELS = { standard: "Standard", minimal: "Minimal", compact: "Kompakt" };
+const WEATHER_CARD_STYLES = ["standard", "minimal", "compact", "detailed"];
+const WEATHER_CARD_STYLE_LABELS = { standard: "Standard", minimal: "Minimal", compact: "Kompakt", detailed: "Detailliert" };
+const WEATHER_CARD_MIN_SIZE = { detailed: { w: 5, h: 6 } };
 
 function buildWeatherCard(loc) {
   const node = weatherCardTemplate.content.firstElementChild.cloneNode(true);
@@ -321,6 +322,7 @@ function buildWeatherCard(loc) {
   node.querySelector(".weather-icon").textContent = "…";
   node.querySelector(".weather-temp").textContent = "";
   node.querySelector(".weather-desc").textContent = "Lädt…";
+  node.querySelector(".wd-location").textContent = loc.name;
   wireFontScaleControls(node, loc);
 
   const styleBtn = node.querySelector(".card-style-btn");
@@ -332,6 +334,15 @@ function buildWeatherCard(loc) {
     node.dataset.style = loc.cardStyle;
     styleBtn.textContent = WEATHER_CARD_STYLE_LABELS[loc.cardStyle];
     saveState();
+
+    const minSize = WEATHER_CARD_MIN_SIZE[loc.cardStyle];
+    const itemEl = node.closest(".grid-stack-item");
+    if (minSize && itemEl && itemEl.gridstackNode) {
+      const gsNode = itemEl.gridstackNode;
+      const w = Math.max(gsNode.w, minSize.w);
+      const h = Math.max(gsNode.h, minSize.h);
+      if (w !== gsNode.w || h !== gsNode.h) grid.update(itemEl, { w, h });
+    }
   });
 
   node.querySelector(".remove-location-btn").addEventListener("click", (e) => {
@@ -388,14 +399,62 @@ function paintWeatherCard(loc, data) {
   if (!card) return;
   const code = data.current?.weather_code;
   const [icon, desc] = wmoInfo(code);
+  const temp = data.current?.temperature_2m;
   card.querySelector(".weather-icon").textContent = icon;
-  card.querySelector(".weather-temp").textContent =
-    data.current?.temperature_2m !== undefined ? `${Math.round(data.current.temperature_2m)}°` : "–";
+  card.querySelector(".weather-temp").textContent = temp !== undefined ? `${Math.round(temp)}°` : "–";
   card.querySelector(".weather-desc").textContent = desc;
   const max = data.daily?.temperature_2m_max?.[0];
   const min = data.daily?.temperature_2m_min?.[0];
   if (max !== undefined && min !== undefined) {
     card.querySelector(".weather-minmax").textContent = `${Math.round(min)}° / ${Math.round(max)}°`;
+  }
+
+  // "detailed" style fields
+  card.querySelector(".wd-current-line").textContent = temp !== undefined ? `${desc}, ${Math.round(temp)}°` : desc;
+  const humidity = data.current?.relative_humidity_2m;
+  card.querySelector(".wd-humidity-line").textContent = humidity !== undefined ? `${Math.round(humidity)}% Luftfeuchtigkeit` : "";
+  card.querySelector(".wd-hero-icon").textContent = icon;
+  card.querySelector(".wd-hero-temp").textContent = temp !== undefined ? `${Math.round(temp)}°` : "–";
+  renderForecastMiniList(card.querySelector(".wd-forecast-list"), data);
+}
+
+function renderForecastMiniList(container, data) {
+  container.innerHTML = "";
+  const days = data.daily?.time || [];
+  const count = Math.min(5, days.length);
+  if (count === 0) return;
+
+  const mins = data.daily.temperature_2m_min.slice(0, count);
+  const maxs = data.daily.temperature_2m_max.slice(0, count);
+  const globalMin = Math.min(...mins);
+  const globalMax = Math.max(...maxs);
+  const range = globalMax - globalMin || 1;
+  const currentTemp = data.current?.temperature_2m;
+
+  for (let i = 0; i < count; i++) {
+    const node = wdDayRowTemplate.content.firstElementChild.cloneNode(true);
+    const d = new Date(days[i]);
+    node.querySelector(".wd-day-name").textContent = i === 0 ? "Heute" : weekdayShort[d.getDay()];
+    const [dIcon] = wmoInfo(data.daily.weather_code[i]);
+    node.querySelector(".wd-day-icon").textContent = dIcon;
+    node.querySelector(".wd-day-min").textContent = `${Math.round(mins[i])}°`;
+    node.querySelector(".wd-day-max").textContent = `${Math.round(maxs[i])}°`;
+
+    const left = ((mins[i] - globalMin) / range) * 100;
+    const width = Math.max(6, ((maxs[i] - mins[i]) / range) * 100);
+    const fill = node.querySelector(".wd-range-fill");
+    fill.style.left = left + "%";
+    fill.style.width = width + "%";
+
+    const dot = node.querySelector(".wd-range-dot");
+    if (i === 0 && currentTemp !== undefined) {
+      const dotLeft = ((currentTemp - globalMin) / range) * 100;
+      dot.style.left = Math.min(100, Math.max(0, dotLeft)) + "%";
+    } else {
+      dot.remove();
+    }
+
+    container.appendChild(node);
   }
 }
 
@@ -404,6 +463,7 @@ function paintWeatherCard(loc, data) {
 const weatherDetailDialog = document.getElementById("weatherDetailDialog");
 const hourlyItemTemplate = document.getElementById("hourlyItemTemplate");
 const dailyItemTemplate = document.getElementById("dailyItemTemplate");
+const wdDayRowTemplate = document.getElementById("wdDayRowTemplate");
 
 document.getElementById("closeWeatherDetail").addEventListener("click", () => weatherDetailDialog.close());
 
