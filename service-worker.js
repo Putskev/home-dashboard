@@ -1,4 +1,4 @@
-const CACHE_NAME = "home-dashboard-v2";
+const CACHE_NAME = "home-dashboard-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,7 +6,10 @@ const APP_SHELL = [
   "./app.js",
   "./manifest.json",
   "./icons/icon.svg",
-  "./icons/icon-maskable.svg",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-192.png",
+  "./icons/icon-maskable-512.png",
 ];
 
 self.addEventListener("install", (event) => {
